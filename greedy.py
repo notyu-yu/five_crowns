@@ -30,13 +30,10 @@ class GreedyPlayer(Player):
         expected_draw_score = sum(draw_scores)/len(draw_scores)
 
         # Take action with better expected score
-        if discard_score > expected_draw_score:
-            print("chose discard")
+        if discard_score < expected_draw_score:
             return GET_DISCARD
-        print("chose draw")
         return DRAW_CARD
 
     def discard_phase(self, game):
         discard, _ = get_best_discard(self.hand, game)
-        print("discard",discard)
         return discard

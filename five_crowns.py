@@ -145,7 +145,7 @@ class Game:
 
         if self._go_out:
             # Draw Phase
-            print("Card in discard pile: ", self._discard_pile[-1])
+            # print("Card in discard pile: ", self._discard_pile[-1])
             if player.draw_phase(self) == GET_DISCARD:
                 player.hand.append(self._discard_pile.pop(-1))
             else:
