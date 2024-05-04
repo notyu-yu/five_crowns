@@ -1,0 +1,2 @@
+DRAW_CARD = 0
+GET_DISCARD = 1

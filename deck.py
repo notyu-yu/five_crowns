@@ -83,3 +83,18 @@ class Deck:
         dealt.reverse()
         del self._cards[-n:]
         return dealt
+
+    def get_cards(self):
+        """
+        Get set of cards
+        """
+        return self._cards
+    
+    def draw(self):
+        """
+        Draw one card from deck
+        """
+        if self.size() > 0:
+            card = random.choice(self._cards)
+            self._cards.remove(card)
+            return card
