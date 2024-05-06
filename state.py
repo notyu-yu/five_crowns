@@ -12,13 +12,15 @@ class State:
     A State class to represent the state of a game
     """
 
-    def __init__(self, game, is_root = False):
+    def __init__(self, game, is_root=False):
         self.is_root = is_root
         self.game = deepcopy(game)
         self.num_players = self.game.num_players()
         self.curr_player_id = self.game.get_active_player()
         self.curr_player_hand = self.game.get_player_hand(self.curr_player_id)
-        self.discard_pile_card = self.game.get_discard_pile()[-1]
+        self.discard_pile_card = (
+            self.game.get_discard_pile()[-1] if self.game.get_discard_pile() else False
+        )
 
     def is_terminal(self):
         """
@@ -27,23 +29,28 @@ class State:
         Returns:
             - bool: True if the game is over else False
         """
-        return self.game.is_game_over() or self.game.get_deck().size() == 0
+        return self.game.is_game_over() or (not self.is_root and self.game.get_deck().size() == 0)
 
     def get_actions(self):
         """
         Returns all possible actions from the current state
         """
         if self.is_root:
-            actions = [("discard", c) for c in self.curr_player_hand]
+            actions = [("root", c) for c in self.curr_player_hand]
 
         else:
             # initialize actions list
-            actions = [("discard", self.discard_pile_card), ("deck", None)]
+            actions = []
 
-            for card in self.curr_player_hand:
-                actions.append(("discard", card))
-                actions.append(("deck", card))
-        
+            if self.discard_pile_card:
+                actions.append(("discard", self.discard_pile_card))
+                for card in self.curr_player_hand:
+                    actions.append(("discard", card))
+            if self.game.get_deck():
+                actions.append(("deck", None))
+                for card in self.curr_player_hand:
+                    actions.append(("deck", card))
+
         return actions
 
     def successor(self, action):
@@ -71,9 +78,10 @@ class State:
         added_card = None
         if first_action == "deck":
             added_card = new_state.get_deck().draw()
+            new_state.get_player_hand(self.curr_player_id).append(added_card)
         elif first_action == "discard":
             added_card = new_state.get_discard_pile().pop()
-        new_state.get_player_hand(self.curr_player_id).append(added_card)
+            new_state.get_player_hand(self.curr_player_id).append(added_card)
 
         # Execute the second action
         if second_action == None:

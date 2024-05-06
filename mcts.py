@@ -48,7 +48,8 @@ def simulate(state):
 def mcts_policy(cpu_time, player_id):
     
     def search_policy(state):
-        root = Node(state, is_root=True)
+        root = Node(state)
+        node_registry = dict()
 
         end_time = time.time() + cpu_time
         while time.time() < end_time:

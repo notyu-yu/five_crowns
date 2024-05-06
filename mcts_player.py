@@ -8,7 +8,7 @@ from scoring import get_best_discard
 class MCTSPlayer(Player):
     def __init__(self, player_id):
         super().__init__(player_id)
-        self.policy = mcts_policy(0.1, player_id)
+        self.policy = mcts_policy(1, player_id)
 
     def draw_phase(self, game):
         # Get best score if we take discard
@@ -33,4 +33,5 @@ class MCTSPlayer(Player):
         return DRAW_CARD
 
     def discard_phase(self, game):
-        return self.policy(game)[1]
+        state = State(game, is_root=True)
+        return self.policy(state)[1]
