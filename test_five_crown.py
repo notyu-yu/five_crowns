@@ -59,7 +59,7 @@ def simulate_one_game(agents,epoch=EPOCH):
 if __name__ == '__main__':
     args = parse_args()
 
-    agent_policies = [GreedyPlayer]*PLAYERS# + [RandomPlayer for i in range(1,PLAYERS)]
+    agent_policies = [GreedyPlayer] + [RandomPlayer for i in range(1,PLAYERS)]
     for epoch_number in range(3,6):
         with Pool(processes = THREADS) as pool:
             scores = pool.map(simulate_one_game,[agent_policies]*args.iters)
