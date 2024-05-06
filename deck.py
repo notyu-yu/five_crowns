@@ -8,12 +8,12 @@ class Card:
     """
 
     def __init__(self, rank, suit):
-        '''
+        """
         Creates card of a given rank and suit
 
         rank -- integer
         suit -- character
-        '''
+        """
         self._rank = rank
         self._suit = suit
         self._hash = str(self).__hash__()
@@ -26,11 +26,13 @@ class Card:
 
     def __repr__(self):
         # For printing
-        return str(self._rank)+str(self._suit)
+        return str(self._rank) + str(self._suit)
 
     def __eq__(self, other):
         # Checking equivalence
-        return self._rank == other._rank and self._suit == other._suit
+        if isinstance(other, Card):
+            return self._rank == other._rank and self._suit == other._suit
+        return False
 
     def __hash__(self):
         # For using a hash key
@@ -57,9 +59,8 @@ class Deck:
         """
         self._cards = []
         for _ in range(copies):
-            self._cards.extend(
-                map(lambda c: Card(*c), it.product(ranks, suits)))
-            self._cards.extend([Card(50, 'J') for _ in range(jokers)])
+            self._cards.extend(map(lambda c: Card(*c), it.product(ranks, suits)))
+            self._cards.extend([Card(50, "J") for _ in range(jokers)])
 
     def shuffle(self):
         """
@@ -89,7 +90,7 @@ class Deck:
         Get set of cards
         """
         return self._cards
-    
+
     def draw(self):
         """
         Draw one card from deck

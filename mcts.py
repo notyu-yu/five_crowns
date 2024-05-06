@@ -47,14 +47,8 @@ def simulate(state):
 
 def mcts_policy(cpu_time, player_id):
     
-    node_registry = {}
-
     def search_policy(state):
-        if state in node_registry:
-            root = node_registry[state]
-        else:
-            root = Node(state)
-            node_registry[state] = root
+        root = Node(state, is_root=True)
 
         end_time = time.time() + cpu_time
         while time.time() < end_time:
@@ -93,6 +87,7 @@ def mcts_policy(cpu_time, player_id):
 
         best_reward = -float("inf")
         best_action = None
+        # print(root.state.curr_player_hand)
         for edge in root.edges:
             reward = edge.child.r / edge.child.n
             if reward > best_reward:

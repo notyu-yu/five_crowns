@@ -15,7 +15,7 @@ class Game:
     Represents a 5 crown game session
     """
 
-    def __init__(self, ranks=RANKS, suits=SUITS, jokers=JOKERS, players=2, epoch=3):
+    def __init__(self, players, ranks=RANKS, suits=SUITS, jokers=JOKERS, epoch=3):
         """
         Create New Game
         """
@@ -30,12 +30,11 @@ class Game:
         self._epoch = epoch
         self._players = players
         self._active_player = 0
-        self._player_hands = [[] for _ in range(players)]
         self._discard_pile = []
 
         # Going out
         self._go_out = False
-        self._remaining_players = players
+        self._remaining_players = len(players)
         self._game_over = False
 
     def all_ranks(self):
@@ -60,7 +59,13 @@ class Game:
         """
         Return number of players
         """
-        return self._players
+        return len(self._players)
+
+    def get_deck(self):
+        """
+        Return deck with no cards missing
+        """
+        return self._deck
 
     def get_full_deck(self):
         """
@@ -112,27 +117,29 @@ class Game:
             return 20
         return card.rank()
 
-    def initialize_game(self, agents):
+    def get_player_hand(self, player_id):
+        return self._players[player_id].hand
+
+    def initialize_game(self):
         """
         Shuffle deck, hand out cards, and flip initial discard
         """
         self._deck.shuffle()
         # Deal cards
         for i in range(self.num_players()):
-            agents[i].hand = self._deck.deal(self._epoch)
+            self._players[i].hand = self._deck.deal(self._epoch)
 
         # Flip initial discard
         self._discard_pile.append(self._deck.deal(1)[0])
 
-    def play_round(self, player):
+    def play_round(self):
         """
         Play a round of 5 crowns
 
         Not Going Out: Player draw a card or get last discard, then discard a card
         Going Out: Player take turn and reveal card, showing final score
         """
-        if self.is_game_over():
-            return
+        player = self._players[self.get_active_player()]
 
         if player.player_id != self._active_player:
             print("Wrong player taking turn")
@@ -141,6 +148,9 @@ class Game:
         if self._deck.size() == 0:
             # No cards left: Game over
             self._game_over = True
+            return
+
+        if self.is_game_over():
             return
 
         if self._go_out:
