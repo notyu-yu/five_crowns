@@ -9,6 +9,7 @@ class MCTSPlayer(Player):
     def __init__(self, player_id):
         super().__init__(player_id)
         self.policy = mcts_policy(1, player_id)
+        self.prev_discard = None
 
     def draw_phase(self, game):
         # Get best score if we take discard
@@ -29,9 +30,11 @@ class MCTSPlayer(Player):
 
         # Take action with better expected score
         if discard_score < expected_draw_score:
+            self.prev_discard = game.get_discard_pile()[-1]
             return GET_DISCARD
+        self.prev_discard = None
         return DRAW_CARD
 
     def discard_phase(self, game):
-        state = State(game, is_root=True)
+        state = State(game, is_root=True, root_card=self.prev_discard)
         return self.policy(state)[1]

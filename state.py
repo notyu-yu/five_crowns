@@ -12,14 +12,16 @@ class State:
     A State class to represent the state of a game
     """
 
-    def __init__(self, game, is_root=False):
+    def __init__(self, game, is_root=False, root_card = None):
         self.is_root = is_root
+        self.root_card = root_card
         self.game = deepcopy(game)
         self.num_players = self.game.num_players()
         self.curr_player_id = self.game.get_active_player()
         self.curr_player_hand = self.game.get_player_hand(self.curr_player_id)
         self.discard_pile_card = (
-            self.game.get_discard_pile()[-1] if self.game.get_discard_pile() else False
+            self.game.get_discard_pile(
+            )[-1] if self.game.get_discard_pile() else False
         )
 
     def is_terminal(self):
@@ -29,21 +31,21 @@ class State:
         Returns:
             - bool: True if the game is over else False
         """
-        return self.game.is_game_over() or (not self.is_root and self.game.get_deck().size() == 0)
+        return self.game.is_game_over() or ((not self.is_root) and (self.game.get_deck().size() == 0 or score_hand(self.curr_player_hand, self.game) == 0))
 
     def get_actions(self):
         """
         Returns all possible actions from the current state
         """
         if self.is_root:
-            actions = [("root", c) for c in self.curr_player_hand]
+            actions = [("root", c) for c in self.curr_player_hand if c != self.root_card]
 
         else:
             # initialize actions list
             actions = []
 
             if self.discard_pile_card:
-                actions.append(("discard", self.discard_pile_card))
+                #actions.append(("discard", self.discard_pile_card))
                 for card in self.curr_player_hand:
                     actions.append(("discard", card))
             if self.game.get_deck():
@@ -88,7 +90,8 @@ class State:
             new_state.get_player_hand(self.curr_player_id).remove(added_card)
             new_state.get_discard_pile().append(added_card)
         else:
-            new_state.get_player_hand(self.curr_player_id).remove(second_action)
+            new_state.get_player_hand(
+                self.curr_player_id).remove(second_action)
             new_state.get_discard_pile().append(second_action)
 
         # Check the hand score and update game ending conditions
@@ -132,7 +135,7 @@ class State:
 
     def __hash__(self):
         return hash(
-            (self.curr_player_id, tuple(self.curr_player_hand), self.discard_pile_card)
+            (self.game)
         )
 
     def __eq__(self, other):

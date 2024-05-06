@@ -1,0 +1,3 @@
+Game for Epoch 3
+Win Rate: 0.3541
+Average Score: 10.7843

@@ -9,9 +9,14 @@ from mcts_player import MCTSPlayer
 from random_player import RandomPlayer
 
 PLAYERS = 4
-EPOCH = 5
-THREADS = 10
+EPOCH = 4
+THREADS = 14
 
+AGENT_MAP = {
+    'greedy':GreedyPlayer,
+    'mcts':MCTSPlayer,
+    'random':RandomPlayer
+}
 
 def parse_args():
     """
@@ -36,7 +41,9 @@ def parse_args():
     parser.add_argument('values', nargs='+', type=int)
     """
 
-    parser.add_argument("--iters", type=int)
+    parser.add_argument("--iters", type=int, default=100)
+    parser.add_argument("--agent", type=str, default="greedy")
+    parser.add_argument("--opponent", type=str, default="random")
 
     args_out = parser.parse_args()
 
@@ -63,7 +70,7 @@ def simulate_one_game(agents, epoch=EPOCH):
 if __name__ == "__main__":
     args = parse_args()
 
-    agent_policies = [MCTSPlayer] + [RandomPlayer for i in range(1, PLAYERS)]
+    agent_policies = [AGENT_MAP[args.agent]] + [AGENT_MAP[args.opponent] for i in range(1, PLAYERS)]
     for epoch_number in range(3, 6):
         with Pool(processes=THREADS) as pool:
             scores = pool.map(simulate_one_game, [agent_policies] * args.iters)
