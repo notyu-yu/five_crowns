@@ -3,17 +3,19 @@ import numpy as np
 from deck import Card
 from dqn import DQN
 
-def card_to_idx(suit, rank):
-  suit_dict = {
-      'Clubs': 0,
-      'Diamonds': 1,
-      'Hearts': 2,
-      'Spades': 3,
-      'Stars': 4,
-      'J': 5
-  }
 
-  return 11 * suit_dict[suit] + (rank if suit != "J" else 0) - 3
+def card_to_idx(suit, rank):
+    suit_dict = {
+        'Clubs': 0,
+        'Diamonds': 1,
+        'Hearts': 2,
+        'Spades': 3,
+        'Stars': 4,
+        'J': 5
+    }
+
+    return 11 * suit_dict[suit] + (rank if suit != "J" else 0) - 3
+
 
 def idx_to_card(idx):
     suit_dict = {
@@ -32,6 +34,7 @@ def idx_to_card(idx):
         rank = (idx % 11) + 3
 
     return Card(rank, suit)
+
 
 def encode_state(num_players, full_deck, player_deck, discard_card, gone_out_status):
     num_players = num_players
@@ -58,12 +61,11 @@ def encode_state(num_players, full_deck, player_deck, discard_card, gone_out_sta
         [gone_out_status_encoded]
     ])
 
-def inference(game, hand, discard_card):
-    encoded_state = encode_state(game.num_players(), game.get_full_deck()._cards, hand, discard_card, game._go_out)
+
+def inference(game, hand, discard_card, model):
+    encoded_state = encode_state(game.num_players(
+    ), game.get_full_deck().get_cards(), hand, discard_card, game.is_going_out())
     encoded_state = torch.Tensor(encoded_state).unsqueeze(0)
-    model = DQN(113, 56)
-    model.load_state_dict(torch.load('five_crowns_dqn.pth'))
-    model.eval()
 
     with torch.no_grad():
         output = model(encoded_state).numpy()[0]
@@ -71,6 +73,6 @@ def inference(game, hand, discard_card):
         sorted_list = [(output[i], idx_to_card(i)) for i in range(len(output))]
         sorted_list.sort(key=lambda x: x[0], reverse=True)
 
-        for i in range(len(sorted_list)):
-            if sorted_list[i][1] in hand:
-                return sorted_list[i][1]
+        for _, card in sorted_list:
+            if card in hand and card != discard_card:
+                return card

@@ -56,7 +56,7 @@ if __name__ == "__main__":
     args = parse_args()
 
     agent_policies = [AGENT_MAP[args.agent]] + [AGENT_MAP[args.opponent] for i in range(1, PLAYERS)]
-    for epoch_number in range(3, 6):
+    for epoch_number in range(3, 4):
         with Pool(processes=THREADS) as pool:
             scores = pool.map(simulate_one_game, [agent_policies] * args.iters)
         print(f"Game for Epoch {epoch_number}")
