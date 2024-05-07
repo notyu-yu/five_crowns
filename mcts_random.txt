@@ -1,6 +1,0 @@
-Game for Epoch 3
-Win Rate: 0.8456
-Average Score: 2.3549
-Game for Epoch 4
-Win Rate: 0.8405
-Average Score: 2.438
