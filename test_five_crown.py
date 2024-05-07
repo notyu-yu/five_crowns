@@ -7,6 +7,7 @@ from scoring import score_hand
 from greedy import GreedyPlayer
 from mcts_player import MCTSPlayer
 from random_player import RandomPlayer
+from dqn_player import DQNPlayer
 
 PLAYERS = 4
 EPOCH = 4
@@ -15,7 +16,8 @@ THREADS = 14
 AGENT_MAP = {
     'greedy':GreedyPlayer,
     'mcts':MCTSPlayer,
-    'random':RandomPlayer
+    'random':RandomPlayer,
+    'dqn':DQNPlayer
 }
 
 def parse_args():
