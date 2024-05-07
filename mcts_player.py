@@ -36,5 +36,14 @@ class MCTSPlayer(Player):
         return DRAW_CARD
 
     def discard_phase(self, game):
-        state = State(game, is_root=True, root_card=self.prev_discard)
+        # Randomize deck and player hands
+        temp_game = copy.deepcopy(game)
+        for player in temp_game._players:
+            if player.player_id != game.get_active_player():
+                temp_game._deck._cards.extend(player.hand)
+        temp_game._deck.shuffle
+        for player in temp_game._players:
+            if player.player_id != game.get_active_player():
+                player.hand = temp_game._deck.deal(temp_game.get_epoch())
+        state = State(temp_game, is_root=True, root_card=self.prev_discard)
         return self.policy(state)[1]

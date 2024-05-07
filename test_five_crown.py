@@ -24,23 +24,6 @@ def parse_args():
     """
     parser = argparse.ArgumentParser()
 
-    """
-    task = parser.add_mutually_exclusive_group()
-    task.add_argument('--find', action="store_true")
-    task.add_argument('--verify', action="store_true")
-
-    parser.add_argument('--tolerance', type=float, default=1e-6)
-
-    scoring = parser.add_mutually_exclusive_group()
-    scoring.add_argument('--win', action="store_true")
-    scoring.add_argument('--score', action="store_true")
-    scoring.add_argument('--lottery', action="store_true")
-
-    parser.add_argument('--units', type=int)
-
-    parser.add_argument('values', nargs='+', type=int)
-    """
-
     parser.add_argument("--iters", type=int, default=100)
     parser.add_argument("--agent", type=str, default="greedy")
     parser.add_argument("--opponent", type=str, default="random")
