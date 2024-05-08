@@ -68,6 +68,7 @@ We had two questions in mind as we were implementing this agent:
 
 
 # Sample Results: {player 1 agent} vs {player 2-4 agent}, 10000 iterations
+# For tests to run: Install packages in requirements.txt
 
 ====================
 Random vs Random:
