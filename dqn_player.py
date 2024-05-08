@@ -13,9 +13,13 @@ class DQNPlayer(Player):
     """
 
     def __init__(self, player_id):
-        super().__init__(player_id)
+        self.player_id = player_id
         self.prev_discard = None
-        self.model = None
+        self.epsilon = 0.05
+        self.prev_action = None
+        self.policy_net = DQN(113, 56).to("cuda")
+        self.policy_net.load_state_dict(torch.load(f'five_crowns_dqn_{3}.pth'))
+        self.policy_net.eval()
 
     def draw_phase(self, game):
         # Get best score if we take discard
@@ -43,11 +47,8 @@ class DQNPlayer(Player):
         return DRAW_CARD
 
     def discard_phase(self, game):
-        if not self.model:
-            self.model = DQN(113, 56)
-            self.model.load_state_dict(torch.load(
-                f'five_crowns_dqn_{game.get_epoch()}.pth'))
-            self.model.eval()
+        with torch.no_grad():
+            action = inference(
+                game, self.hand, self.prev_discard, self.policy_net)
 
-        action = inference(game, self.hand, self.prev_discard, self.model)
         return action

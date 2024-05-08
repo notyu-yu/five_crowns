@@ -48,7 +48,7 @@ def encode_state(num_players, full_deck, player_deck, discard_card, gone_out_sta
 
     # Encode discard card as (rank, suit)
     discard_card_encoded = np.zeros(len(deck))
-    if discard_card:
+    if discard_card is not None:
         discard_idx = card_to_idx(discard_card.suit(), discard_card.rank())
         discard_card_encoded[discard_idx] = 1
 
@@ -62,13 +62,13 @@ def encode_state(num_players, full_deck, player_deck, discard_card, gone_out_sta
     ])
 
 
-def inference(game, hand, discard_card, model):
+def inference(game, hand, discard_card, policy_net):
     encoded_state = encode_state(game.num_players(
-    ), game.get_full_deck().get_cards(), hand, discard_card, game.is_going_out())
-    encoded_state = torch.Tensor(encoded_state).unsqueeze(0)
+    ), game.get_full_deck()._cards, hand, discard_card, game._go_out)
 
     with torch.no_grad():
-        output = model(encoded_state).numpy()[0]
+        output = policy_net(torch.Tensor(
+            encoded_state).to("cuda")).to("cpu").numpy()
 
         sorted_list = [(output[i], idx_to_card(i)) for i in range(len(output))]
         sorted_list.sort(key=lambda x: x[0], reverse=True)

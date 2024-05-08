@@ -35,11 +35,12 @@ def parse_args():
     return args_out
 
 
-def simulate_one_game(agents, epoch=EPOCH):
+def simulate_one_game(args):
     """
     Simulate one game with given parameters
     Return player 1 score
     """
+    agents, epoch = args
     players = [(agents[i])(i) for i in range(len(agents))]
     game = Game(players=players, epoch=epoch)
     game.initialize_game()
@@ -58,7 +59,7 @@ if __name__ == "__main__":
     agent_policies = [AGENT_MAP[args.agent]] + [AGENT_MAP[args.opponent] for i in range(1, PLAYERS)]
     for epoch_number in range(3, 4):
         with Pool(processes=THREADS) as pool:
-            scores = pool.map(simulate_one_game, [agent_policies] * args.iters)
+            scores = pool.map(simulate_one_game, [(agent_policies,epoch_number)] * args.iters)
         print(f"Game for Epoch {epoch_number}")
         print(f"Win Rate: {sum([1 for i in scores if i == 0])/args.iters}")
         print(f"Average Score: {sum(scores)/args.iters}")
