@@ -1,13 +1,27 @@
+"""
+MCTS class
+"""
+
 import math
 import time
-import random
 from copy import deepcopy
-from random_player import RandomPlayer
+
 from scoring import score_hand
+from random_player import RandomPlayer
 
 DEPTH = 20
 
+
 class Edge:
+    """
+    Edge class for MCTS
+
+    Attributes:
+        - child: The child node
+        - action: The action taken to reach the child node
+        - n: The number of times the edge has been visited
+    """
+
     def __init__(self, child, action=None):
         self.child = child
         self.action = action
@@ -15,6 +29,22 @@ class Edge:
 
 
 class Node:
+    """
+    Node class for MCTS
+
+    Attributes:
+        - state: The state of the node
+        - edges: The edges from the node
+        - n: The number of times the node has been visited
+        - r: The reward of the node
+        - unused_actions: The actions that have not been explored yet
+        - parent: The parent node
+
+    Methods:
+        - best_child(): Returns the best child node based on the UCB formula
+        - is_expanded(): Determines whether the node has been fully expanded or not
+    """
+
     def __init__(self, state, parent=None):
         self.state = state
         self.edges = []
@@ -24,6 +54,13 @@ class Node:
         self.parent = parent
 
     def best_child(self):
+        """
+        Returns the best child node based on the UCB formula
+
+        Returns:
+            - int: The index of the best child node
+        """
+        # Get best child with UCB
         T = sum(e.n for e in self.edges)
         max_ucb = -float("inf")
         max_index = -1
@@ -37,31 +74,85 @@ class Node:
         return max_index
 
     def is_expanded(self):
+        """
+        Determines whether the node has been fully expanded or not
+
+        Returns:
+            - bool: True if the node has been fully expanded else False
+        """
         return len(self.edges) == len(self.state.get_actions())
 
 
-def partial_score(hand,game):
-    score = score_hand(hand,game)
+def partial_score(hand, game):
+    """
+    Heuristic for hand score before game ends
+
+    Args:
+        hand (list): List of cards in hand
+        game (Game): Game object
+
+    Returns:
+        int: Partial score of the hand
+    """
+    # Heuristic for hand score before game ends
+    score = score_hand(hand, game)
     return (100 if score == 0 else 0) - score
 
 
 def simulate(state):
+    """
+    Simulate game until DEPTH or finish
+
+    Args:
+        state (State): State of the game
+
+    Returns:
+        list: List of partial scores for each player
+    """
     d = 0
+
+    # Make Copy of game
     temp_game = deepcopy(state.game)
     temp_players = [RandomPlayer(i) for i in range(temp_game.num_players())]
     temp_hands = [deepcopy(player.hand) for player in temp_game._players]
-    for player,new_hand in zip(temp_players,temp_hands):
+    for player, new_hand in zip(temp_players, temp_hands):
         player.hand = new_hand
     temp_game._players = temp_players
+
+    # Run game until DEPTH or finish
     while not temp_game.is_game_over() and d < DEPTH:
         temp_game.play_round()
         d += 1
-    return [partial_score(temp_game._players[i].hand,temp_game) for i in range(temp_game.num_players())]
+
+    return [
+        partial_score(temp_game._players[i].hand, temp_game)
+        for i in range(temp_game.num_players())
+    ]
 
 
 def mcts_policy(cpu_time, player_id):
-    
+    """
+    MCTS policy for player
+
+    Args:
+        cpu_time (int): CPU time for MCTS
+        player_id (int): Player ID
+
+    Returns:
+        function: Policy function
+    """
+
     def search_policy(state):
+        """
+        MCTS Policy function
+
+        Args:
+            state (State): State of the game
+
+        Returns:
+            int: Action to take
+        """
+
         root = Node(state)
         node_registry = dict()
 
@@ -70,7 +161,7 @@ def mcts_policy(cpu_time, player_id):
         while time.time() < end_time:
             iters += 1
             node = root
-            
+
             # Traversal
             while node.is_expanded() and not node.state.is_terminal():
                 index = node.best_child()
@@ -97,26 +188,20 @@ def mcts_policy(cpu_time, player_id):
             payoff_array = simulate(node.state)
 
             # Backpropagation
-            seen_nodes = set([node])
             while node.parent is not None:
                 node.n += 1
                 node.r += payoff_array[node.parent.state.actor()]
                 node = node.parent
-                assert node not in seen_nodes, "loop detected"
-                seen_nodes.add(node)
 
+        # Find best move
         best_reward = -float("inf")
         best_action = None
-        # print(root.state.curr_player_hand)
         for edge in root.edges:
             reward = edge.child.r / edge.child.n
             if reward > best_reward:
                 best_reward = reward
                 best_action = edge.action
-        
-        if not best_action:
-            print('iters',iters)
-            print(root.edges)
+
         return best_action
 
     return search_policy

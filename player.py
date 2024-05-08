@@ -1,8 +1,23 @@
+"""
+Player class and HumanPlayer class
+"""
+
 from abc import ABC, abstractmethod
 
-from constants import DRAW_CARD, GET_DISCARD
 
 class Player(ABC):
+    """
+    Player class
+    
+    Attributes:
+        player_id (int): Player ID
+        hand (list): List of cards in hand
+        
+    Methods:
+        show_hand: Show hand of player
+        draw_phase: Draw phase for player
+        discard_phase: Discard phase for player
+    """
     def __init__(self, player_id):
         self.player_id = player_id
         self.hand = []
@@ -17,22 +32,3 @@ class Player(ABC):
     @abstractmethod
     def discard_phase(self, game):
         pass
-
-class HumanPlayer(Player):
-    def draw_phase(self, game):
-        while True:
-            self.show_hand()
-            choice = input("Would you like to draw from the deck or the discard pile? (deck/discard): ").lower()
-            if choice != "deck" or choice != "discard":
-                print("Please enter a valid action.")
-            else:
-                return DRAW_CARD if choice == "deck" else GET_DISCARD
-            
-    def discard_phase(self, game):
-        while True:
-            self.show_hand()
-            discard = input("Which card would you like to discard?: ")
-            if discard in self.hand:
-                print("Please choose a card in your hand.")
-            else:
-                return discard

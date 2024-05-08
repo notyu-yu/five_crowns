@@ -1,10 +1,11 @@
-import itertools as it
-import copy
-
+'''
+Provides Game object for five crown games
+'''
 from scoring import score_hand
 from deck import Deck, Card
 from constants import DRAW_CARD, GET_DISCARD
 
+# Game constants
 RANKS = range(3, 14)
 SUITS = ['Clubs', 'Diamonds', 'Hearts', 'Spades', 'Stars']
 JOKERS = 3
@@ -155,7 +156,6 @@ class Game:
 
         if self._go_out:
             # Draw Phase
-            # print("Card in discard pile: ", self._discard_pile[-1])
             if player.draw_phase(self) == GET_DISCARD:
                 player.hand.append(self._discard_pile.pop(-1))
             else:
@@ -173,6 +173,7 @@ class Game:
             if self._remaining_players == 0:
                 self._game_over = True
         else:
+            # Draw Phase
             if player.draw_phase(self) == GET_DISCARD:
                 player.hand.append(self._discard_pile.pop(-1))
             else:

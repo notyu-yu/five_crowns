@@ -45,5 +45,6 @@ class MCTSPlayer(Player):
         for player in temp_game._players:
             if player.player_id != game.get_active_player():
                 player.hand = temp_game._deck.deal(temp_game.get_epoch())
+        # Get best move by MCTS
         state = State(temp_game, is_root=True, root_card=self.prev_discard)
         return self.policy(state)[1]

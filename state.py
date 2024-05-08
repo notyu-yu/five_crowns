@@ -1,7 +1,6 @@
 """
 State class for MCTS
 """
-
 from copy import deepcopy
 
 from scoring import score_hand
@@ -9,7 +8,23 @@ from scoring import score_hand
 
 class State:
     """
-    A State class to represent the state of a game
+    A class to represent the state of the game
+    
+    Attributes:
+        - game: The current game state
+        - num_players: The number of players in the game
+        - curr_player_id: The ID of the current player
+        - curr_player_hand: The hand of the current player
+        - discard_pile_card: The card on the discard pile
+        - is_root: A boolean indicating if the state is the root of the tree
+        - root_card: The card that was used to create the root state
+    
+    Methods:
+        - is_terminal(): Determines whether the current state is a terminal state or not
+        - get_actions(): Returns all possible actions from the current state
+        - successor(action): Returns the successor state given the action from the current state
+        - payoff(): Calculates the reward for the player at this state
+        - actor(): Determines the ID of the current player
     """
 
     def __init__(self, game, is_root=False, root_card = None):
@@ -36,18 +51,22 @@ class State:
     def get_actions(self):
         """
         Returns all possible actions from the current state
+
+        Returns:
+            - list: A list of all possible actions from the current state
         """
         if self.is_root:
             actions = [("root", c) for c in self.curr_player_hand if c != self.root_card]
 
         else:
-            # initialize actions list
+            # Initialize actions list
             actions = []
 
             if self.discard_pile_card:
-                #actions.append(("discard", self.discard_pile_card))
                 for card in self.curr_player_hand:
                     actions.append(("discard", card))
+            
+            # Check if deck is empty
             if self.game.get_deck():
                 actions.append(("deck", None))
                 for card in self.curr_player_hand:
@@ -95,7 +114,6 @@ class State:
             new_state.get_discard_pile().append(second_action)
 
         # Check the hand score and update game ending conditions
-        # print(new_state.get_player_hand(self.curr_player_id))
         hand_score = score_hand(
             new_state.get_player_hand(self.curr_player_id), new_state
         )

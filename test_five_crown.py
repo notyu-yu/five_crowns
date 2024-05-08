@@ -1,3 +1,6 @@
+"""
+Test script for Five Crowns
+"""
 import argparse
 
 from multiprocessing import Pool
@@ -5,20 +8,21 @@ from multiprocessing import Pool
 from five_crowns import Game
 from scoring import score_hand
 from greedy import GreedyPlayer
+from dqn_player import DQNPlayer
 from mcts_player import MCTSPlayer
 from random_player import RandomPlayer
-from dqn_player import DQNPlayer
 
 PLAYERS = 4
 EPOCH = 4
 THREADS = 14
 
 AGENT_MAP = {
-    'greedy':GreedyPlayer,
-    'mcts':MCTSPlayer,
-    'random':RandomPlayer,
-    'dqn':DQNPlayer
+    "greedy": GreedyPlayer,
+    "mcts": MCTSPlayer,
+    "random": RandomPlayer,
+    "dqn": DQNPlayer,
 }
+
 
 def parse_args():
     """
@@ -35,12 +39,17 @@ def parse_args():
     return args_out
 
 
-def simulate_one_game(args):
+def simulate_one_game(agents, epoch=EPOCH):
     """
     Simulate one game with given parameters
     Return player 1 score
+
+    Args:
+        args (tuple): Tuple of (agents, epoch)
+
+    Returns:
+        int: Score of player 1
     """
-    agents, epoch = args
     players = [(agents[i])(i) for i in range(len(agents))]
     game = Game(players=players, epoch=epoch)
     game.initialize_game()

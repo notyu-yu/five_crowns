@@ -1,27 +1,41 @@
-import itertools as it
+"""
+Creates Card and Deck classes for card games
+"""
+
 import random
+import itertools as it
 
 
 class Card:
     """
-    Represents a card of given suit and rank
+    Represents a card of given rank and suit
+
+    Methods:
+        rank(): Return rank of card
+        suit(): Return suit of card
     """
 
     def __init__(self, rank, suit):
-        """
-        Creates card of a given rank and suit
-
-        rank -- integer
-        suit -- character
-        """
         self._rank = rank
         self._suit = suit
         self._hash = str(self).__hash__()
 
     def rank(self):
+        """
+        Return rank of card
+
+        Returns:
+            int: Rank of card
+        """
         return self._rank
 
     def suit(self):
+        """
+        Return suit of card
+
+        Returns:
+            str: Suit of card
+        """
         return self._suit
 
     def __repr__(self):
@@ -42,6 +56,13 @@ class Card:
 class Deck:
     """
     Represents a one-time use deck of cards
+
+    Methods:
+        shuffle(): Shuffle deck
+        size(): Return number of remaining cards
+        deal(n): Remove and return next n cards
+        get_cards(): Get set of cards
+        draw(): Draw one card from deck
     """
 
     def __init__(self, ranks, suits, jokers, copies):
@@ -71,6 +92,9 @@ class Deck:
     def size(self):
         """
         Return number of remaining cards
+
+        Returns:
+            int: Number of cards left in deck
         """
         return len(self._cards)
 
@@ -78,7 +102,8 @@ class Deck:
         """
         Remove and return next n cards
 
-        n -- Interger between 0 and dech size
+        Returns:
+            list: List of n cards
         """
         dealt = self._cards[-n:]
         dealt.reverse()
@@ -88,12 +113,18 @@ class Deck:
     def get_cards(self):
         """
         Get set of cards
+
+        Returns:
+            list: List of cards
         """
         return self._cards
 
     def draw(self):
         """
         Draw one card from deck
+
+        Returns:
+            Card: Card drawn
         """
         if self.size() > 0:
             card = random.choice(self._cards)
