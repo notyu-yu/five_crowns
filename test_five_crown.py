@@ -14,7 +14,7 @@ from random_player import RandomPlayer
 
 PLAYERS = 4
 EPOCH = 4
-THREADS = 14
+THREADS = 8
 
 AGENT_MAP = {
     "greedy": GreedyPlayer,
@@ -39,7 +39,7 @@ def parse_args():
     return args_out
 
 
-def simulate_one_game(agents, epoch=EPOCH):
+def simulate_one_game(args):
     """
     Simulate one game with given parameters
     Return player 1 score
@@ -50,6 +50,7 @@ def simulate_one_game(agents, epoch=EPOCH):
     Returns:
         int: Score of player 1
     """
+    agents, epoch = args
     players = [(agents[i])(i) for i in range(len(agents))]
     game = Game(players=players, epoch=epoch)
     game.initialize_game()
@@ -66,7 +67,7 @@ if __name__ == "__main__":
     args = parse_args()
 
     agent_policies = [AGENT_MAP[args.agent]] + [AGENT_MAP[args.opponent] for i in range(1, PLAYERS)]
-    for epoch_number in range(3, 4):
+    for epoch_number in range(3, 6):
         with Pool(processes=THREADS) as pool:
             scores = pool.map(simulate_one_game, [(agent_policies,epoch_number)] * args.iters)
         print(f"Game for Epoch {epoch_number}")
